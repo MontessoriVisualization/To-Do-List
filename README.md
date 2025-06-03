@@ -22,7 +22,7 @@
 
 ---
 
-## 📌 Overview
+## Overview 📌
 
 Welcome to the **To-Do List Web App** — your personal productivity assistant, inspired by the elegance and functionality of tools like **Microsoft To Do**.
 
@@ -35,7 +35,7 @@ This web application is crafted to streamline your task management process. Whet
 
 ---
 
-## ✨ Features
+## Features ✨
 
 * 🆕 **Add New Tasks:** Quickly input tasks with a title, due date, and optional description.
 * 🗂️ **Task Categorization:** Organize your tasks into *To-Do*, *In Progress*, and *Completed*.
@@ -49,7 +49,7 @@ This web application is crafted to streamline your task management process. Whet
 
 ---
 
-## 🚀 Demo
+## Demo 🚀
 
 🔗 [**Live Demo**](https://your-demo-link.com)
 
@@ -58,7 +58,7 @@ This web application is crafted to streamline your task management process. Whet
 
 ---
 
-## 🔧 Installation
+## Installation 🔧
 
 Get the app running locally in just a few steps:
 
@@ -86,7 +86,7 @@ Your app will now be running on `http://localhost:5500` 🚀
 
 ---
 
-## 📂 Usage
+## Usage 📂
 
 1. Open the app in your browser.
 2. Add a new task using the input form.
@@ -96,17 +96,17 @@ Your app will now be running on `http://localhost:5500` 🚀
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack 🛠️
 
-* ⚛️ **React** — UI rendering
-* 🧠 **TypeScript** — Static type checking
-* 🌬️ **Tailwind CSS** — Utility-first styling
-* 🧱 **shadcn/ui** — Prebuilt accessible components
-* 🌐 **Local Storage API** — Persistent data storage
+* ⚛️ **HTML** — UI Structure
+* 🧠 **JavaScript** — Logic
+* 🌬️ **CSS** — Utility-first styling
+*🕰️ Chrono Node — Natural language date parsing (e.g., "tomorrow at 5pm")
+*🌐 Local Storage API — Persistent data storage
 
 ---
 
-## 🔍 How It Works
+## How It Works 🔍
 
 1. User inputs are captured via forms with validation.
 2. Tasks are stored in localStorage to persist data.
@@ -115,7 +115,7 @@ Your app will now be running on `http://localhost:5500` 🚀
 
 ---
 
-## 📈 Roadmap
+## Roadmap 📈
 
 * [x] MVP Task Manager
 * [ ] Subtasks
@@ -130,7 +130,7 @@ Feel free to suggest more features by opening an [issue](https://github.com/Mont
 
 ---
 
-## 🤝 Contributing
+## Contributing 🤝
 
 We welcome contributions with open arms 🤗
 
@@ -144,13 +144,13 @@ Please review our [contribution guidelines](CONTRIBUTING.md) first.
 
 ---
 
-## 🪪 License
+## License 🪪
 
 Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
 
 ---
 
-## 📬 Contact
+## Contact 📬
 
 **Your Name**
 📧 [your.email@example.com](montessorivisualization.com)
