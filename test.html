@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="checkbox" name="" id="checkbox" />
+    <script>
+      const checkbox = document.getElementById("checkbox");
+
+      checkbox.addEventListener("change", function () {
+        if (checkbox.checked) {
+          console.log("Checkbox is checked");
+        } else {
+          console.log("Checkbox is unchecked");
+        }
+      });
+      // Save an array of tasks
+      let tasks = ["Buy milk", "Study SAT", "Code project"];
+      localStorage.setItem("myTasks", JSON.stringify(tasks));
+
+      // Later, retrieve it:
+      let savedTasks = JSON.parse(localStorage.getItem("myTasks"));
+      console.log(savedTasks); // ["Buy milk", "Study SAT", "Code project"]
+    </script>
+  </body>
+</html>
