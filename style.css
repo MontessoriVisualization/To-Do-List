@@ -1,209 +1,265 @@
-:root{
-    --main: #101314;
-    --primary:#B1DDF1;
-    --secondary: #F1F1F1;
-    --tersery: #596066;
---input-primary: #262a2e;
---input-primary-hover: #363c42;
---input-secondary-hover: #4a5157;
+:root {
+  --main: #101314;
+  --primary: #b1ddf1;
+  --secondary: #f1f1f1;
+  --tersery: #596066;
+  --input-primary: #262a2e;
+  --input-primary-hover: #363c42;
+  --input-secondary-hover: #4a5157;
 }
 
-
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-body{
-background-color:var(--main);
-    max-width: 100%;
-    height: 100vh;
-    margin:1.2em;
-   font-family: sans-serif;
-    overflow: hidden;
-color: white;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-svg{
-    height:inherit;
+.active {
+  opacity: 1;
+  display: flex;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.inactive {
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 
-    
+  transform: translateY(-20px);
+  pointer-events: none;
 }
-.nav-sec-menu{
-    height:30px;
-    margin-bottom: 0.9em;
-    
-}
-.nav-main{
-    display: flex;
-        align-items: center;
-        justify-content: space-between;
-        
-
-}
-.nav-main-icon{
-    color: var(--primary);
-    font-size: 30px;
-    height:30px;
-        color: var(--primary);
-font-weight: bold;
+body {
+  background-color: var(--main);
+  max-width: 100%;
+  height: 100vh;
+  margin: 1.2em;
+  font-family: sans-serif;
+  overflow: hidden;
+  color: white;
 }
 
-main{
-    margin-top: 2em;
+svg {
+  height: inherit;
 }
-button{
-    background-color: transparent;
-    border: none;
-    color: var(--primary);
-    cursor: pointer;
-    padding: 0.2em;
-    margin: 0.4em;
-        border-radius: 5px;
+.nav-sec-menu {
+  height: 30px;
+  margin-bottom: 0.9em;
+}
+.nav-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-main-icon {
+  color: var(--primary);
+  font-size: 30px;
+  height: 30px;
+  color: var(--primary);
+  font-weight: bold;
+}
 
+main {
+  margin-top: 2em;
 }
-button:hover{
-    background-color: var(--input-secondary-hover);
+button {
+  background-color: transparent;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0.2em;
+  margin: 0.4em;
+  border-radius: 5px;
+}
+button:hover {
+  background-color: var(--input-secondary-hover);
+}
+button.nav-minimize {
+  background-color: var(--input-primary);
+}
+button.nav-minimize:hover {
+  background-color: var(--input-primary-hover);
+}
+.nav-main-more-options {
+  width: 240px;
+  position: fixed;
+  top: 100px;
+  right: 10px;
+  background-color: var(--input-primary);
+  z-index: 1000;
+  flex-direction: column;
+  gap: 1em;
+  border-radius: 5px;
+}
+.sort-list-options {
+  width: 194px;
+  position: fixed;
+  top: 1px;
+  right: 241px;
+  background-color: var(--input-primary);
+  z-index: 1000;
+  flex-direction: column;
+  gap: 1em;
+  display: flex;
+  border-radius: 5px;
+}
+.nav-main-more-options li:hover,
+.nav-main-more-options li:hover span,
+.sort-list-options li:hover {
+  background-color: var(--tersery);
+}
+.nav-main-more-options li {
+  display: flex;
 
+  padding: 0.9em;
+  align-items: center;
 }
-button.nav-minimize{
-    background-color: var(--input-primary);
- 
+.sort-list {
+  justify-content: space-between;
 }
-button.nav-minimize:hover{
-    background-color: var(--input-primary-hover);
+.nav-main-more-options span,
+.sort-option {
+  background-color: var(--input-primary);
+  font-size: 0.9rem;
+
+  display: flex;
+  align-items: center;
+
+  gap: 1.2em;
+}
+.nav-main-more-options .theme-container {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+.theme-options {
+  width: 100%;
+  margin-top: 0.3em;
+}
+.nav-main-more-options .theme-options {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5em;
+  padding: 0.5em;
+}
+
+.theme-option:hover .theme-container:hover {
+  background-color: var(--primary);
 }
 
 /* main */
-.task{
-    width: 100%;
-    height: 60px;
-    border-radius: 5px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-    padding:0.5em;
-    background-color: var(--input-primary);
-    margin-bottom: 0.2em;
+.task {
+  width: 100%;
+  height: 60px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5em;
+  background-color: var(--input-primary);
+  margin-bottom: 0.2em;
 }
 .task input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid white;
-    background-color: transparent;
-    cursor: pointer;
-    position: relative;
-    outline: none;
-    margin: 0.4em;
-
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background-color: transparent;
+  cursor: pointer;
+  position: relative;
+  outline: none;
+  margin: 0.4em;
 }
 
 .task input[type="checkbox"]:checked::before,
 .task input[type="checkbox"]:hover::before {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 12px;
-    line-height: 1;
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000;
+  font-size: 12px;
+  line-height: 1;
 }
 
 .task input[type="checkbox"]:checked {
-    background-color:transparent;
-
+  background-color: var(--primary);
+  border: transparent;
 }
 
 .task input[type="checkbox"]:hover:not(:checked) {
-    background-color: transparent;
+  background-color: transparent;
 }
-.task-info{
-    display: flex;
-    flex-direction: column;
+.task-info {
+  display: flex;
+  flex-direction: column;
 
-    margin-left: 10px;
-    font-size: 0.88rem;
+  margin-left: 10px;
+  font-size: 0.88rem;
 }
-.task-title{
-    margin-bottom: 0.6em;
+.task-title {
+  margin-bottom: 0.6em;
 }
-.lucide-star-icon{
-    height: 18px;
+.lucide-star-icon {
+  height: 18px;
 }
-.lucide-star-icon:hover{
-    color: var(--primary);
+.lucide-star-icon:hover {
+  color: var(--primary);
 }
 
-.add-task{
+.add-task {
+  display: flex;
 
-    display: flex;
-    
-    flex-direction: column;
-    align-items: end;
+  flex-direction: column;
+  align-items: end;
+}
+.add-task {
+  width: 100%;
+  left: 0px;
+  position: fixed;
+  padding: 0 1.2em;
 
+  bottom: 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  z-index: 100;
 }
-.add-task{
-    width: 100%;
-    left: 0px;
-    /* background-color: blue; */
-    position: fixed;
-    padding: 0 1.2em;
-
-    bottom: 0px;
-    display: flex;
-    flex-direction: column;
-    align-items: end;
-    z-index: 100;
+.add-task input[type="text"] {
+  width: 100%;
+  height: 50px;
+  border-radius: 5px;
+  background-color: var(--input-primary);
+  color: white;
+  padding: 0.5em;
+  font-size: 16px;
+  border: none;
+  outline: none;
+  margin-bottom: 2em;
 }
-.add-task input[type="text"]{
-    width: 100%;
-    height: 50px;
-    border-radius: 5px;
-    background-color: var(--input-primary);
-    color: white;
-    padding: 0.5em;
-    font-size: 16px;
-    border: none;
-    outline: none;
-    margin-bottom: 2em;
-}
-.add-task button{
-width: 50px;
-height: 50px;
-border-radius: 50%;
-background-color: var(--input-primary);
-font-size: 20px;
+.add-task button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--input-primary);
+  font-size: 20px;
 }
 
 /* taskcomplete */
-.toggle-task-complete{
-    padding: 0.4em 0.7em;
-    margin: 0.9em 0;
+.toggle-task-complete {
+  padding: 0.4em 0.7em;
+  margin: 0.9em 0;
 
-    background-color: var(--input-primary);
-    color: var(--secondary);
-    align-items: center;
-    display: flex;
-    gap: 0.5em;
+  background-color: var(--input-primary);
+  color: var(--secondary);
+  align-items: center;
+  display: flex;
+  gap: 0.5em;
 }
 
-.completed-task-title{
-
-    text-decoration: line-through;
-    color: var(--tersery);
+.completed-task-title {
+  text-decoration: line-through;
+  color: var(--tersery);
 }
-
-.completed-task input[type="checkbox"]:checked {
-    background-color:var(--primary);
-    border: transparent;
-
-}
-.completed-task input[type="checkbox"]:checked::before
- {
-color: #000;
-}
-
