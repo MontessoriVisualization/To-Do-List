@@ -1,7 +1,3 @@
-Certainly. Below is a professionally enhanced and more visually engaging version of your README file, modeled after a high-quality application like **Microsoft To Do**, complete with emoji and enriched sections:
-
----
-
 # 📝 To-Do List Web App
 
 *A smart, sleek, and intuitive task manager — organize your day, your way.*
@@ -73,20 +69,20 @@ Get the app running locally in just a few steps:
 
 ### Setup Instructions
 
+```bash
 # Clone the repository
-git clone https://github.com/yourusername/your-repo.git
+git clone https://github.com/MontessoriVisualization/To-Do-List.git
 
 # Navigate into the project directory
 cd your-repo
 
 # Install dependencies
-npm install
+npm install chrono-node
 
-# Start the development server
-npm run dev
+# Use Live Server / open the file directly
 ```
 
-Your app will now be running on `http://localhost:3000` 🚀
+Your app will now be running on `http://localhost:5500` 🚀
 
 ---
 
@@ -102,10 +98,10 @@ Your app will now be running on `http://localhost:3000` 🚀
 
 ## 🛠️ Technology Stack
 
-* ⚛️ **HTML** — UI rendering
-* 🧠 **JS** — Static type checking
-* 🌬️ **CSS** — Utility-first styling
-*🕰️ Chrono Node — Natural language date parsing (e.g., "tomorrow at 5pm")
+* ⚛️ **React** — UI rendering
+* 🧠 **TypeScript** — Static type checking
+* 🌬️ **Tailwind CSS** — Utility-first styling
+* 🧱 **shadcn/ui** — Prebuilt accessible components
 * 🌐 **Local Storage API** — Persistent data storage
 
 ---
@@ -130,7 +126,7 @@ Your app will now be running on `http://localhost:3000` 🚀
 * [ ] Theme customization (Dark Mode)
 * [ ] PWA Support for offline installation
 
-Feel free to suggest more features by opening an [issue](https://github.com/yourusername/your-repo/issues)!
+Feel free to suggest more features by opening an [issue](https://github.com/MontessoriVisualization/To-Do-List.git/issues)!
 
 ---
 
@@ -157,10 +153,6 @@ Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information
 ## 📬 Contact
 
 **Your Name**
-📧 [your.email@example.com](mailto:your.email@example.com)
-🐙 [GitHub](https://github.com/yourusername)
+📧 [your.email@example.com](montessorivisualization.com)
+🐙 [GitHub](https://github.com/MontessoriVisualization)
 🔗 [LinkedIn](https://www.linkedin.com/in/yourprofile)
-
----
-
-If you'd like, I can generate a professional banner or icons, or assist you in converting this into a beautiful GitHub Pages site. Please let me know.
