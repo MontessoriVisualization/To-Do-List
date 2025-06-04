@@ -3,27 +3,48 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Todo List</title>
   </head>
   <body>
-    <input type="checkbox" name="" id="checkbox" />
+    <input type="checkbox" name="" class="checkbox" data-task="Buy milk" />
+    <input type="checkbox" name="" class="checkbox" data-task="Study SAT" />
+    <input type="checkbox" name="" class="checkbox" data-task="Code project" />
+    <input type="checkbox" name="" class="checkbox" data-task="Exercise" />
     <script>
-      const checkbox = document.getElementById("checkbox");
+      const checkboxes = document.querySelectorAll(".checkbox");
 
-      checkbox.addEventListener("change", function () {
-        if (checkbox.checked) {
-          console.log("Checkbox is checked");
-        } else {
-          console.log("Checkbox is unchecked");
+      // Initialize tasks from localStorage or create empty array
+      let savedTasks = JSON.parse(localStorage.getItem("myTasks")) || [];
+
+      // Add event listeners to all checkboxes
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", handleCheckboxChange);
+      });
+
+      function handleCheckboxChange(event) {
+        const taskText = event.target.dataset.task;
+        const isChecked = event.target.checked;
+
+        // Update savedTasks based on checkbox state
+        if (isChecked && !savedTasks.includes(taskText)) {
+          savedTasks.push(taskText);
+        } else if (!isChecked && savedTasks.includes(taskText)) {
+          savedTasks = savedTasks.filter((task) => task !== taskText);
+        }
+
+        // Save to localStorage
+        localStorage.setItem("myTasks", JSON.stringify(savedTasks));
+
+        // Log current tasks
+        console.log(savedTasks);
+      }
+
+      // Display initial state
+      checkboxes.forEach((checkbox) => {
+        if (savedTasks.includes(checkbox.dataset.task)) {
+          checkbox.checked = true;
         }
       });
-      // Save an array of tasks
-      let tasks = ["Buy milk", "Study SAT", "Code project"];
-      localStorage.setItem("myTasks", JSON.stringify(tasks));
-
-      // Later, retrieve it:
-      let savedTasks = JSON.parse(localStorage.getItem("myTasks"));
-      console.log(savedTasks); // ["Buy milk", "Study SAT", "Code project"]
     </script>
   </body>
 </html>
