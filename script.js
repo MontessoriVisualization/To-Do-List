@@ -204,7 +204,21 @@ window.addEventListener("DOMContentLoaded", () => {
   tasks.forEach((task) => {
     const newTask = document.createElement("div");
 
-    addTaskValues(newTask, task.title);
+    addTaskValues(newTask, task.title, task.id);
+    const checkbox = newTask.querySelector(".checkbox");
+    // If the task is completed, mark it as such
+
+    if (task.completed) {
+      checkbox.checked = true;
+      const taskTitle = newTask.querySelector(".task-title");
+      if (taskTitle) {
+        taskTitle.classList.add("completed-task-title");
+        taskTitle.classList.remove("inco-task-title");
+      }
+      CompetTaskList.appendChild(newTask);
+    } else {
+      incoTaskList.appendChild(newTask);
+    }
   });
   touggleCheckbox();
 });
