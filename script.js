@@ -89,6 +89,12 @@ function touggleCheckbox() {
     checkbox.addEventListener("change", () => {
       const taskContainer = checkbox.closest(".task");
       const taskTitle = taskContainer.querySelector(".task-title");
+      const index = taskContainer.getAttribute("index");
+      const taskText = index;
+      console.log(taskText);
+
+      updateTaskCompletionStatus(taskText, checkbox.checked);
+
       if (checkbox.checked) {
         if (taskTitle) {
           taskTitle.classList.add("completed-task-title");
@@ -119,20 +125,23 @@ function getCurrentDate() {
 taskInput.addEventListener("keypress", (event) => {
   if (event.key === "Enter" && taskInput.value.trim() !== "") {
     const newTask = document.createElement("div");
-    var title = taskInput.value.trim();
-
+    let title = taskInput.value.trim();
+    var id = new Date().getTime(); // Generate a unique ID based on the current timestamp
     // Use a different variable name to avoid conflicts with built-in Date object
     const taskDate = getCurrentDate(); // Get the current date
-    addTaskValues(newTask, title);
+
+    addTaskValues(newTask, title, id);
+
     touggleCheckbox();
-    addValuesToLocalStorage(title, taskDate);
+    addValuesToLocalStorage(title, taskDate, id);
     taskInput.value = ""; // Clear the input field after adding the task
   }
   // Reapply the checkbox toggle functionality to the new task
 });
 //ADD values to new tasks
-function addTaskValues(newTask, title) {
+function addTaskValues(newTask, title, id) {
   newTask.classList.add("task");
+  newTask.setAttribute("index", id);
   newTask.classList.add("inco-task");
   newTask.innerHTML = `
               <div style="display: flex; align-items: center;">
@@ -161,16 +170,32 @@ function addTaskValues(newTask, title) {
 }
 
 //Add values to local storage
-function addValuesToLocalStorage(title, date) {
+function addValuesToLocalStorage(title, date, id) {
   const task = {
+    id: id, // Unique ID based on current timestamp
     title: title,
     date: date,
-    completed: false, // Default value for new tasks
+    completed: false, // Default status for new tasks
   };
   let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
   tasks.push(task);
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
+
+function updateTaskCompletionStatus(title, isCompleted) {
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  // Find the task by title and update its completed status
+  const updatedTasks = tasks.map((task) => {
+    if (task.id == title) {
+      return { ...task, completed: isCompleted };
+    }
+    return task;
+  });
+
+  localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+}
+
 // Load tasks from local storage on page load
 
 window.addEventListener("DOMContentLoaded", () => {
