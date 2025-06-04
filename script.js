@@ -106,6 +106,7 @@ function touggleCheckbox() {
     });
   });
 }
+
 //Current Date and Time
 function getCurrentDate() {
   const currentDate = new Date();
@@ -119,20 +120,20 @@ taskInput.addEventListener("keypress", (event) => {
   if (event.key === "Enter" && taskInput.value.trim() !== "") {
     const newTask = document.createElement("div");
     var title = taskInput.value.trim();
-    newTask.classList.add("task");
-    newTask.classList.add("inco-task");
 
     // Use a different variable name to avoid conflicts with built-in Date object
     const taskDate = getCurrentDate(); // Get the current date
     addTaskValues(newTask, title);
+    touggleCheckbox();
     addValuesToLocalStorage(title, taskDate);
     taskInput.value = ""; // Clear the input field after adding the task
   }
-  touggleCheckbox();
   // Reapply the checkbox toggle functionality to the new task
 });
 //ADD values to new tasks
 function addTaskValues(newTask, title) {
+  newTask.classList.add("task");
+  newTask.classList.add("inco-task");
   newTask.innerHTML = `
               <div style="display: flex; align-items: center;">
 
@@ -141,7 +142,7 @@ function addTaskValues(newTask, title) {
                 <span class="task-title inco-task-title">${title}</span>
                 ${
                   taskDate
-                    ? `
+                    ? ` 
                 <span class="task-date"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
                 ${taskDate}
                 </span>
@@ -164,6 +165,7 @@ function addValuesToLocalStorage(title, date) {
   const task = {
     title: title,
     date: date,
+    completed: false, // Default value for new tasks
   };
   let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
   tasks.push(task);
@@ -173,10 +175,10 @@ function addValuesToLocalStorage(title, date) {
 
 window.addEventListener("DOMContentLoaded", () => {
   const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
   tasks.forEach((task) => {
     const newTask = document.createElement("div");
-    newTask.classList.add("task");
-    newTask.classList.add("inco-task");
+
     addTaskValues(newTask, task.title);
   });
   touggleCheckbox();
