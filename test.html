@@ -3,48 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Todo List</title>
+    <title>Document</title>
+    <!-- <script src="https://unpkg.com/chrono-node"></script> -->
   </head>
   <body>
-    <input type="checkbox" name="" class="checkbox" data-task="Buy milk" />
-    <input type="checkbox" name="" class="checkbox" data-task="Study SAT" />
-    <input type="checkbox" name="" class="checkbox" data-task="Code project" />
-    <input type="checkbox" name="" class="checkbox" data-task="Exercise" />
-    <script>
-      const checkboxes = document.querySelectorAll(".checkbox");
-
-      // Initialize tasks from localStorage or create empty array
-      let savedTasks = JSON.parse(localStorage.getItem("myTasks")) || [];
-
-      // Add event listeners to all checkboxes
-      checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener("change", handleCheckboxChange);
-      });
-
-      function handleCheckboxChange(event) {
-        const taskText = event.target.dataset.task;
-        const isChecked = event.target.checked;
-
-        // Update savedTasks based on checkbox state
-        if (isChecked && !savedTasks.includes(taskText)) {
-          savedTasks.push(taskText);
-        } else if (!isChecked && savedTasks.includes(taskText)) {
-          savedTasks = savedTasks.filter((task) => task !== taskText);
-        }
-
-        // Save to localStorage
-        localStorage.setItem("myTasks", JSON.stringify(savedTasks));
-
-        // Log current tasks
-        console.log(savedTasks);
-      }
-
-      // Display initial state
-      checkboxes.forEach((checkbox) => {
-        if (savedTasks.includes(checkbox.dataset.task)) {
-          checkbox.checked = true;
-        }
-      });
-    </script>
+    <input type="text" id="input" />
+    <script type="module" src="test-chrono.js"></script>
   </body>
 </html>
