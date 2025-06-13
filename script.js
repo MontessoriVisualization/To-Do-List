@@ -4,17 +4,21 @@ import * as chrono from "https://esm.sh/chrono-node@2.7.3";
 const secMenu = document.querySelector(".nav-sec-menu");
 const minimizeBtn = document.querySelector(".nav-minimize");
 const moreMenu = document.querySelector(".nav-main-more");
-const addTaskBtn = document.querySelector("add-task button");
 const Themes = document.querySelectorAll(".theme-option");
 const sortTaskBtn = document.querySelector(".sort-list");
+const closeTaskBtn = document.querySelector(".close-button button");
+const addTaskBtn = document.querySelector(".add-task button");
+
 // Navigation elements
+const iniFav = document.querySelector(".aside-star-icon");
 
 const sortOptions = document.querySelector(".sort-list-options");
+const rightSideBar = document.querySelector(".right-sidebar");
 const navMoreOptions = document.querySelector(".nav-main-more-options");
 const TaskTitle = document.querySelectorAll(".task-title");
+
 // Incomplete Task List
 const incoTaskList = document.querySelector(".inco-tasks");
-const incoTask = document.querySelectorAll(".inco-task");
 const incoTaskChekbox = document.querySelector("#inco-checkbox");
 // Completed Task List
 const CompetTaskList = document.querySelector(".completed-tasks");
@@ -23,9 +27,12 @@ const compTaskChekbox = document.querySelectorAll(".comp-checkbox");
 const compTaskTitle = document.querySelector(".completed-task-title");
 
 //input task
-const taskInput = document.querySelector(".add-task input");
+const taskInput = document.querySelectorAll(".add-task input");
 
 //Global Variables
+let dateSelected = null;
+let oldvalues = [];
+
 const taskDate = ""; // Empty by default
 
 const dateKeywords = [
@@ -49,16 +56,30 @@ const dateKeywords = [
 
 //Initial Setup
 touggleCheckbox();
+initStarButtons();
 toggleStarButtons();
-
+addDateByAside();
+initOldValues();
+toggleAsideOptions();
 //Just space
-document.addEventListener("keypress", (event) => {
-  if (event.key === " ") {
-    taskInput.focus(); // Focus on the task input when space is pressed
-  }
-});
 
-//Star setup
+//initital Star setup
+function initStarButtons() {
+  iniFav.addEventListener("click", () => {
+    iniFav.classList.toggle("active");
+  });
+
+  return iniFav.classList.contains("active");
+}
+
+//check if the star button is active
+function isStarButtonActive(input) {
+  if (input.closest(".right-sidebar")) {
+    return iniFav.classList.contains("active");
+  } else {
+    return false; // If not in the right sidebar, return false
+  }
+}
 // For all star buttons, hide them initially
 function toggleStarButtons() {
   const favBtn = document.querySelectorAll(".fav-star");
@@ -86,11 +107,12 @@ moreMenu.addEventListener("click", () => {
   navMoreOptions.classList.toggle("active");
   navMoreOptions.classList.toggle("inactive");
 });
-document.addEventListener("click", (event) => {
-  if (
-    !moreMenu.contains(event.target) &&
-    !navMoreOptions.contains(event.target)
-  ) {
+document.addEventListener("click", (e) => {
+  if (e.key === " ") {
+    taskInput.focus(); // Focus on the task input when space is pressed
+  }
+
+  if (!moreMenu.contains(e.target) && !navMoreOptions.contains(e.target)) {
     //if the click is outside the more menu and its options it hides the option
 
     navMoreOptions.classList.add("inactive");
@@ -150,6 +172,24 @@ function touggleCheckbox() {
     });
   });
 }
+//toggle aside options
+function toggleAsideOptions() {
+  const asideOption = document.querySelectorAll(".option-item");
+
+  asideOption.forEach((option) => {
+    option.onclick = () => {
+      const otherOption = option.querySelector(".date-options");
+      if (
+        otherOption.classList.contains("active") ||
+        otherOption.classList.contains("inactive")
+      ) {
+        console.log("toggled");
+        otherOption.classList.toggle("active");
+        otherOption.classList.toggle("inactive");
+      }
+    };
+  });
+}
 
 //Current Date and Time
 function getCurrentDate() {
@@ -158,35 +198,54 @@ function getCurrentDate() {
   return currentDate.toLocaleDateString(undefined, options);
   // Format the date as "Month Day, Year"
 }
+// Toggle Side Menu
+addTaskBtn.addEventListener("click", () => {
+  rightSideBar.style.display = "block"; // Show the sidebar when the button is clicked
+});
+// Close Task List
+closeTaskBtn.addEventListener("click", () => {
+  rightSideBar.style.display = "none"; // Show the sidebar when the button is clicked
+});
 
 //Add Task
-taskInput.addEventListener("keypress", (event) => {
-  if (event.key === "Enter" && taskInput.value.trim() !== "") {
-    const newTask = document.createElement("div");
-    let title = taskInput.value.trim();
-    const results = chrono.parse(title); // Parse the input using chrono
-    let task = title;
-    let Duedate = null;
-    var id = new Date().getTime(); // Generate a unique ID based on the current timestamp
-    if (results.length != 0) {
-      task = title.replace(results[0].text, "").trim();
-      task = cleanExtraPhrases(task);
-      const display = results[0]?.start?.date(); // ⇒ Date | undefined
-      Duedate = display?.toString().replace(/\sGMT.*$/, "");
+taskInput.forEach((input) => {
+  input.addEventListener("keypress", (event) => {
+    if (event.key === "Enter" && input.value.trim() !== "") {
+      const newTask = document.createElement("div");
+      let title = input.value.trim();
+      const results = chrono.parse(title); // Parse the input using chrono
+
+      let task = title;
+      let Duedate = null;
+      const currentFav = isStarButtonActive(input); // Check if the star button is active
+      console.log(currentFav);
+
+      var id = new Date().getTime(); // Generate a unique ID based on the current timestamp
+      if (results.length != 0) {
+        task = title.replace(results[0].text, "").trim();
+        task = cleanExtraPhrases(task);
+        const display = results[0]?.start?.date(); // ⇒ Date | undefined
+        Duedate = display?.toString().replace(/\sGMT.*$/, "");
+      } else if (dateSelected !== null) {
+        Duedate = dateSelected;
+        console.log(Duedate);
+        dateSelected = null;
+      }
+      const taskDate = getCurrentDate(); // Get the current date
+      addTaskValues(newTask, task, id, Duedate, currentFav); // Add values to the new task
+
+      touggleCheckbox();
+      toggleStarButtons();
+      addValuesToLocalStorage(task, taskDate, id, Duedate, currentFav);
+      // Add values to local storage
+
+      input.value = ""; // Clear the input field after adding the task
     }
-
-    const taskDate = getCurrentDate(); // Get the current date
-    addTaskValues(newTask, task, id, Duedate);
-
-    touggleCheckbox();
-    toggleStarButtons();
-    addValuesToLocalStorage(task, taskDate, id, Duedate); // Add values to local storage
-    taskInput.value = ""; // Clear the input field after adding the task
-  }
+  });
   // Reapply the checkbox toggle functionality to the new task
 });
 //ADD values to new tasks
-function addTaskValues(newTask, title, id, taskDate) {
+function addTaskValues(newTask, title, id, taskDate, currentFav) {
   newTask.classList.add("task");
   newTask.setAttribute("index", id);
   newTask.classList.add("inco-task");
@@ -211,19 +270,22 @@ function addTaskValues(newTask, title, id, taskDate) {
         </div>
 
             
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fav-star lucide lucide-star-icon lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a.53.53 0 0 0 .399.29 2.123 2.123 0 0 0 1.196.87l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="
+       ${
+         currentFav ? "active" : ""
+       } fav-star lucide lucide-star-icon lucide-star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a.53.53 0 0 0 .399.29 2.123 2.123 0 0 0 1.196.87l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>
         `;
   incoTaskList.appendChild(newTask);
 }
 
 //Add values to local storage
-function addValuesToLocalStorage(title, date, id, Duedate) {
+function addValuesToLocalStorage(title, date, id, Duedate, currentFav) {
   const task = {
     id: id, // Unique ID based on current timestamp
     title: title,
     date: date,
     Duedate: Duedate,
-    fav: false,
+    fav: currentFav,
     completed: false, // Default status for new tasks
   };
   let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
@@ -308,4 +370,69 @@ function cleanExtraPhrases(text) {
     .replace(regex, "")
     .replace(/\s{2,}/g, " ")
     .trim();
+}
+//initilie old values
+function initOldValues() {
+  const taskOptions = document.querySelectorAll(".task-option");
+  taskOptions.forEach((option) => {
+    const allMainContainer = option.closest(".task-option");
+
+    const allTitle = allMainContainer.querySelector(".option-text").textContent;
+    oldvalues.push({
+      content: allMainContainer.innerHTML,
+      title: allTitle,
+    });
+  });
+}
+
+// aside date options
+
+function addDateByAside() {
+  const dateTaskOption = document.querySelectorAll(".date-option");
+
+  dateTaskOption.forEach((option) => {
+    option.addEventListener("click", () => {
+      const mainContainer = option.closest(".task-option");
+      let content = option.querySelector(".date-title").textContent;
+      const title = mainContainer.querySelector(".option-text").textContent;
+      console.log(content);
+      mainContainer.setAttribute("title", title);
+      dateSelected = chrono
+        .parseDate(content)
+        ?.toString()
+        .replace(/\sGMT.*$/, "");
+
+      console.log(oldvalues);
+      mainContainer.innerHTML = `<div class="changed-option" style="  display: flex;
+  justify-content: space-between;
+  padding:16px;
+  align-items: center;
+  color: var(--primary);">
+            <span class="option-text" style ="  color: var(--primary);">${dateSelected}</span>
+            <svg class="lucide" viewBox="0 0 24 24" width="21px" height="21px" xmlns="http://www.w3.org/2000/svg">
+              <path d="m18 6-12 12"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+       
+          </div>`;
+      removeDateByAside();
+    });
+  });
+}
+function removeDateByAside() {
+  const remChangedOption = document.querySelectorAll(".changed-option svg");
+  remChangedOption.forEach((option) => {
+    option.onclick = () => {
+      const mainContainer = option.closest(".task-option");
+      const title = mainContainer.getAttribute("title");
+      oldvalues.map((oldValue) => {
+        if (oldValue.title === title) {
+          mainContainer.innerHTML = oldValue.content;
+          console.log("help");
+          toggleAsideOptions();
+          addDateByAside();
+        }
+      });
+    };
+  });
 }

@@ -53,3 +53,13 @@
 
 //   input.value = "";
 // });
+ratio();
+ratio();
+function ratio() {
+  const Checkbox = document.querySelectorAll(".input");
+  Checkbox.forEach((box) => {
+    box.addEventListener("click", () => {
+      console.log("clicked");
+    });
+  });
+}
