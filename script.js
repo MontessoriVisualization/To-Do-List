@@ -111,7 +111,6 @@ document.addEventListener("click", (e) => {
   if (e.key === " ") {
     taskInput.focus(); // Focus on the task input when space is pressed
   }
-
   if (!moreMenu.contains(e.target) && !navMoreOptions.contains(e.target)) {
     //if the click is outside the more menu and its options it hides the option
 
@@ -178,7 +177,7 @@ function toggleAsideOptions() {
 
   asideOption.forEach((option) => {
     option.onclick = () => {
-      const otherOption = option.querySelector(".date-options");
+      const otherOption = option.querySelector(".task-options-more");
       if (
         otherOption.classList.contains("active") ||
         otherOption.classList.contains("inactive")
@@ -186,11 +185,24 @@ function toggleAsideOptions() {
         console.log("toggled");
         otherOption.classList.toggle("active");
         otherOption.classList.toggle("inactive");
+        closeAsideOptions(otherOption, option);
       }
     };
   });
 }
 
+function closeAsideOptions(otherOption, option) {
+  document.addEventListener("click", (e) => {
+    if (
+      !otherOption.contains(e.target) &&
+      !option.contains(e.target) &&
+      otherOption.classList.contains("active")
+    ) {
+      otherOption.classList.add("inactive");
+      otherOption.classList.remove("active");
+    }
+  });
+}
 //Current Date and Time
 function getCurrentDate() {
   const currentDate = new Date();
@@ -384,7 +396,8 @@ function initOldValues() {
     });
   });
 }
-
+console.log(chrono.parse("next Friday at 3pm"));
+console.log(chrono.parseDate("next Friday at 3pm").getDay());
 // aside date options
 
 function addDateByAside() {
@@ -397,6 +410,7 @@ function addDateByAside() {
       const title = mainContainer.querySelector(".option-text").textContent;
       console.log(content);
       mainContainer.setAttribute("title", title);
+
       dateSelected = chrono
         .parseDate(content)
         ?.toString()
@@ -428,7 +442,6 @@ function removeDateByAside() {
       oldvalues.map((oldValue) => {
         if (oldValue.title === title) {
           mainContainer.innerHTML = oldValue.content;
-          console.log("help");
           toggleAsideOptions();
           addDateByAside();
         }
@@ -436,3 +449,28 @@ function removeDateByAside() {
     };
   });
 }
+
+//Assigning date to date-option
+function assignDateToOption() {
+  const dateOption = document.querySelectorAll(".date-option");
+  dateOption.forEach((option) => {
+    const content = option.querySelector(".date-title").textContent;
+    const dateContainer = option.querySelector(".main-date");
+
+    const parsedDate = chrono.parseDate(content);
+    // const parsedDate = chrono.parseDate("next Friday");
+
+    // Format parts
+    const day = parsedDate.getDate(); // e.g., 21
+    const time = parsedDate.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }); // e.g., "3:00 PM"
+
+    dateContainer.innerHTML = `
+      <span class="date-day">${day}</span>
+      <span class="date-time">${time}</span>
+    `;
+  });
+}
+assignDateToOption();
