@@ -16,6 +16,7 @@
 
 .active {
   opacity: 1;
+  z-index: 2;
   display: flex;
   transform: translateY(0);
   transition: opacity 0.3s ease, transform 0.3s ease;
@@ -28,9 +29,7 @@
   transform: translateY(-20px);
   pointer-events: none;
 }
-.hidden {
-  display: none;
-}
+
 svg.active {
   stroke: none;
   fill: gold;
@@ -142,12 +141,25 @@ we aside {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   margin: 0.3em 0;
   padding: 16px;
   cursor: pointer;
   background-color: var(--input-primary);
   border-radius: 4px;
   transition: background-color 0.2s ease;
+}
+
+#file-preview {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5em;
+  padding: 0.5em;
+}
+.hidden {
+  opacity: 0;
+  position: absolute;
 }
 .task-option {
   position: relative;
@@ -532,4 +544,26 @@ main {
     top: 100px;
     right: 10px;
   }
+}
+/* Custom styles for the repeat indicator */
+.task-repeat {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8em;
+  color: var(--primary);
+  padding: 2px 4px;
+  border-radius: 3px;
+  background-color: rgba(var(--primary-rgb), 0.1);
+}
+
+.task-repeat svg {
+  margin-right: 4px;
+}
+
+input[type="file"] {
+  display: none;
+}
+input#realTimeInput {
+  opacity: 0;
+  width: 0;
 }

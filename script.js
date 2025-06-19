@@ -1,5 +1,5 @@
 import * as chrono from "https://esm.sh/chrono-node@2.7.3";
-// DOM Elements
+// DOM Elementsy
 // Toggle buttons
 const secMenu = document.querySelector(".nav-sec-menu");
 const minimizeBtn = document.querySelector(".nav-minimize");
@@ -8,7 +8,9 @@ const Themes = document.querySelectorAll(".theme-option");
 const sortTaskBtn = document.querySelector(".sort-list");
 const closeTaskBtn = document.querySelector(".close-button button");
 const addTaskBtn = document.querySelector(".add-task button");
-
+const myDayOPtion = document.querySelector(".option-myday");
+const dateTimeTrigger = document.getElementById("time-trigger");
+const dateTimeInput = document.getElementById("realTimeInput");
 // Navigation elements
 const iniFav = document.querySelector(".aside-star-icon");
 
@@ -32,6 +34,11 @@ const taskInput = document.querySelectorAll(".add-task input");
 //Global Variables
 let dateSelected = null;
 let oldvalues = [];
+let day = "";
+let base64Url = [];
+
+let time = "9:00 PM"; // Default time
+let repeatOption = ""; // New variable to track repeat option
 
 const taskDate = ""; // Empty by default
 
@@ -55,13 +62,14 @@ const dateKeywords = [
 ];
 
 //Initial Setup
+addTitle();
 touggleCheckbox();
 initStarButtons();
 toggleStarButtons();
-addDateByAside();
+addToMyDay();
 initOldValues();
 toggleAsideOptions();
-//Just space
+assignDateToOption();
 
 //initital Star setup
 function initStarButtons() {
@@ -72,13 +80,54 @@ function initStarButtons() {
   return iniFav.classList.contains("active");
 }
 
+function addTitle() {
+  const mainContainer = document.querySelectorAll(".task-option");
+  mainContainer.forEach((container) => {
+    const title = container.querySelector(".option-text").textContent;
+    container.setAttribute("title", title);
+  });
+}
+
 //check if the star button is active
 function isStarButtonActive(input) {
   if (input.closest(".right-sidebar")) {
-    return iniFav.classList.contains("active");
+    const value = iniFav.classList.contains("active");
+    if (value) {
+      iniFav.classList.remove("active");
+    }
+    return value; // Return true if the star button is active, false otherwise
   } else {
     return false; // If not in the right sidebar, return false
   }
+}
+function isMyDay(input) {
+  if (input.closest(".right-sidebar")) {
+    const myDayElement = document.querySelector(".option-myday");
+    const title = myDayElement.getAttribute("title");
+    const value = myDayElement.classList.contains("active");
+
+    if (value) {
+      const changedOption = myDayElement.querySelector(".changed-option");
+      if (changedOption) {
+        setTimeout(() => {
+          reviveOldValue(myDayElement, title);
+          myDayElement.classList.remove("active");
+        }, 100);
+      }
+    }
+    return value; // Return true if the My Day option is active, false otherwise
+  } else {
+    return false; // If not in the right sidebar, return false
+  }
+}
+function resetToggle() {
+  const mainContainer = document.querySelectorAll(".task-option");
+  mainContainer.forEach((container) => {
+    if (container.querySelector(".changed-option")) {
+      const title = container.getAttribute("title");
+      reviveOldValue(container, title);
+    }
+  });
 }
 // For all star buttons, hide them initially
 function toggleStarButtons() {
@@ -178,14 +227,17 @@ function toggleAsideOptions() {
   asideOption.forEach((option) => {
     option.onclick = () => {
       const otherOption = option.querySelector(".task-options-more");
-      if (
-        otherOption.classList.contains("active") ||
-        otherOption.classList.contains("inactive")
-      ) {
-        console.log("toggled");
-        otherOption.classList.toggle("active");
-        otherOption.classList.toggle("inactive");
-        closeAsideOptions(otherOption, option);
+      if (otherOption) {
+        if (
+          otherOption.classList.contains("active") ||
+          otherOption.classList.contains("inactive")
+        ) {
+          console.log("toggled");
+          otherOption.classList.toggle("active");
+          otherOption.classList.toggle("inactive");
+          closeAsideOptions(otherOption, option);
+        }
+        addDateByAside();
       }
     };
   });
@@ -230,8 +282,7 @@ taskInput.forEach((input) => {
       let task = title;
       let Duedate = null;
       const currentFav = isStarButtonActive(input); // Check if the star button is active
-      console.log(currentFav);
-
+      const MyDay = isMyDay(input); // Check if the My Day option is selected
       var id = new Date().getTime(); // Generate a unique ID based on the current timestamp
       if (results.length != 0) {
         task = title.replace(results[0].text, "").trim();
@@ -241,43 +292,64 @@ taskInput.forEach((input) => {
       } else if (dateSelected !== null) {
         Duedate = dateSelected;
         console.log(Duedate);
+        resetToggle();
         dateSelected = null;
       }
+
       const taskDate = getCurrentDate(); // Get the current date
-      addTaskValues(newTask, task, id, Duedate, currentFav); // Add values to the new task
+      addTaskValues(newTask, task, id, Duedate, currentFav, repeatOption); // Add values to the new task
 
       touggleCheckbox();
       toggleStarButtons();
-      addValuesToLocalStorage(task, taskDate, id, Duedate, currentFav);
-      // Add values to local storage
+      addValuesToLocalStorage(
+        task,
+        taskDate,
+        id,
+        Duedate,
+        currentFav,
+        MyDay,
+        repeatOption,
+        base64Url
+      );
 
-      input.value = ""; // Clear the input field after adding the task
+      repeatOption = "";
+      input.value = "";
+      base64Url = [];
     }
   });
   // Reapply the checkbox toggle functionality to the new task
 });
 //ADD values to new tasks
-function addTaskValues(newTask, title, id, taskDate, currentFav) {
+function addTaskValues(newTask, title, id, taskDate, currentFav, repeatoption) {
   newTask.classList.add("task");
   newTask.setAttribute("index", id);
   newTask.classList.add("inco-task");
+
+  const repeatInfo = repeatoption
+    ? `
+    <span class="task-repeat"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-repeat"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+    ${repeatoption}</span>`
+    : "";
   newTask.innerHTML = `
               <div style="display: flex; align-items: center;">
 
                <input type="checkbox" name="" class="inco-checkbox checkbox">
                 <div class="task-info">
                 <span class="task-title inco-task-title">${title}</span>
+                <span style='display:flex; align-items: center; gap: 8px;'>
                 ${
                   taskDate
                     ? ` 
                 <span class="task-date"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
-                ${taskDate}
+                               ${taskDate}
                 </span>
                 `
                     : ""
                 }
-                
-            </div>
+
+                ${repeatInfo}
+                </span>
+                </div>
         
         </div>
 
@@ -291,18 +363,33 @@ function addTaskValues(newTask, title, id, taskDate, currentFav) {
 }
 
 //Add values to local storage
-function addValuesToLocalStorage(title, date, id, Duedate, currentFav) {
+function addValuesToLocalStorage(
+  title,
+  date,
+  id,
+  Duedate,
+  currentFav,
+  MyDay,
+  repeatoption,
+  base64Url
+) {
   const task = {
-    id: id, // Unique ID based on current timestamp
+    id: id,
     title: title,
     date: date,
     Duedate: Duedate,
     fav: currentFav,
-    completed: false, // Default status for new tasks
+    completed: false,
+    myDay: MyDay,
+    repeat: repeatoption,
+    base64Url: base64Url,
   };
   let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
   tasks.push(task);
   localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  // Reset repeat option after saving
+  repeatOption = "";
 }
 
 function updateTaskCompletionStatus(title, isCompleted) {
@@ -344,19 +431,28 @@ window.addEventListener("DOMContentLoaded", () => {
   tasks.forEach((task) => {
     const newTask = document.createElement("div");
 
-    addTaskValues(newTask, task.title, task.id, task.Duedate);
+    addTaskValues(
+      newTask,
+      task.title,
+      task.id,
+      task.Duedate,
+      task.fav,
+      task.repeat
+    );
+
     const checkbox = newTask.querySelector(".checkbox");
     // If the task is completed, mark it as such
     const favStar = newTask.querySelector(".fav-star");
     if (task.fav) {
-      favStar.setAttribute("title", "Remove from favorites");
       favStar.style.fill = "gold";
       favStar.style.stroke = "none";
     } else {
-      favStar.setAttribute("title", "Add to favorites");
       favStar.style.fill = "none";
       favStar.style.stroke = "white";
     }
+
+    // Add repeat indicator if task has repeat option
+
     if (task.completed) {
       checkbox.checked = true;
       const taskTitle = newTask.querySelector(".task-title");
@@ -373,6 +469,8 @@ window.addEventListener("DOMContentLoaded", () => {
   toggleStarButtons();
 });
 
+// New function to handle repeat options
+
 // Function to clean extra phrases from the task input
 function cleanExtraPhrases(text) {
   console.log(dateKeywords.join("|"));
@@ -385,87 +483,164 @@ function cleanExtraPhrases(text) {
 }
 //initilie old values
 function initOldValues() {
-  const taskOptions = document.querySelectorAll(".task-option");
+  const taskOptions = document.querySelectorAll(".option-item");
   taskOptions.forEach((option) => {
-    const allMainContainer = option.closest(".task-option");
-
-    const allTitle = allMainContainer.querySelector(".option-text").textContent;
+    const allTitle = option.querySelector(".option-text").textContent;
+    console.log(allTitle);
     oldvalues.push({
-      content: allMainContainer.innerHTML,
+      content: option.outerHTML,
       title: allTitle,
     });
   });
 }
-console.log(chrono.parse("next Friday at 3pm"));
-console.log(chrono.parseDate("next Friday at 3pm").getDay());
-// aside date options
 
 function addDateByAside() {
   const dateTaskOption = document.querySelectorAll(".date-option");
 
   dateTaskOption.forEach((option) => {
-    option.addEventListener("click", () => {
+    option.onclick = () => {
+      console.log("clicked");
       const mainContainer = option.closest(".task-option");
+      const title = mainContainer.getAttribute("title");
       let content = option.querySelector(".date-title").textContent;
-      const title = mainContainer.querySelector(".option-text").textContent;
-      console.log(content);
-      mainContainer.setAttribute("title", title);
+      if (content) {
+        const parsedDate = chrono.parseDate(content);
 
-      dateSelected = chrono
-        .parseDate(content)
-        ?.toString()
-        .replace(/\sGMT.*$/, "");
+        // Format parts
+        if (title == "Remind me") {
+          time = "9:00 PM";
+          day = parsedDate.toLocaleDateString([], {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          });
+        } else if (title == "Add due date") {
+          day = parsedDate.toLocaleDateString([], {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          });
+        } else if (title == "Repeat") {
+          // Handle repeat option selection
+          repeatOption = content.trim();
+        }
 
-      console.log(oldvalues);
-      mainContainer.innerHTML = `<div class="changed-option" style="  display: flex;
+        dateSelected = day + " " + time;
+
+        console.log(oldvalues);
+        mainContainer.innerHTML = `<div class="changed-option" style="display: flex;
   justify-content: space-between;
+width: 100%;
   padding:16px;
   align-items: center;
   color: var(--primary);">
-            <span class="option-text" style ="  color: var(--primary);">${dateSelected}</span>
+            <span class="option-text" style ="  color: var(--primary);">${
+              title == "Repeat" ? "Repeats " + repeatOption : dateSelected
+            } </span>
             <svg class="lucide" viewBox="0 0 24 24" width="21px" height="21px" xmlns="http://www.w3.org/2000/svg">
               <path d="m18 6-12 12"></path>
               <path d="m6 6 12 12"></path>
             </svg>
        
           </div>`;
-      removeDateByAside();
-    });
-  });
-}
-function removeDateByAside() {
-  const remChangedOption = document.querySelectorAll(".changed-option svg");
-  remChangedOption.forEach((option) => {
-    option.onclick = () => {
-      const mainContainer = option.closest(".task-option");
-      const title = mainContainer.getAttribute("title");
-      oldvalues.map((oldValue) => {
-        if (oldValue.title === title) {
-          mainContainer.innerHTML = oldValue.content;
-          toggleAsideOptions();
-          addDateByAside();
-        }
-      });
+        removeDateByAside();
+      }
     };
   });
 }
+//costume time
 
+dateTimeTrigger.addEventListener("click", () => {
+  dateTimeInput.focus();
+  try {
+    dateTimeInput.showPicker?.();
+  } catch (e) {
+    dateTimeInput.click();
+  }
+});
+document.getElementById("fileInput").addEventListener("change", function () {
+  const files = Array.from(this.files);
+  files.forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      base64Url.push(e.target.result);
+      const url = e.target.result;
+      handleFiles(file, url);
+    };
+    reader.readAsDataURL(file);
+  });
+});
+
+function handleFiles(file, url) {
+  const preview = document.getElementById("file-preview");
+  if (file.type.startsWith("image/")) {
+    preview.classList.remove("hidden");
+
+    const img = document.createElement("img");
+    img.src = url;
+    img.style.width = "100%";
+    img.style.height = "auto";
+    img.style.borderRadius = "8px";
+    preview.appendChild(img);
+  }
+}
+
+function removeDateByAside() {
+  const remChangedOption = document.querySelectorAll(".changed-option svg");
+  remChangedOption.forEach((option) => {
+    option.onclick = (e) => {
+      e.stopPropagation(); // Prevent triggering the parent click event
+      const mainContainer = option.closest(".task-option");
+      const title = mainContainer.getAttribute("title");
+
+      reviveOldValue(mainContainer, title);
+      if (mainContainer.classList.contains("option-myday")) {
+        mainContainer.classList.remove("active");
+      }
+    };
+  });
+}
+function reviveOldValue(mainContainer, title) {
+  oldvalues.map((oldValue) => {
+    if (oldValue.title === title) {
+      mainContainer.classList.toggle("active");
+      mainContainer.innerHTML = oldValue.content;
+      toggleAsideOptions();
+      addDateByAside();
+      addToMyDay();
+      assignDateToOption();
+    }
+  });
+}
 //Assigning date to date-option
 function assignDateToOption() {
   const dateOption = document.querySelectorAll(".date-option");
   dateOption.forEach((option) => {
     const content = option.querySelector(".date-title").textContent;
     const dateContainer = option.querySelector(".main-date");
-
+    const mainContainer = option.closest(".task-option");
+    const title = mainContainer.getAttribute("title");
     const parsedDate = chrono.parseDate(content);
-    // const parsedDate = chrono.parseDate("next Friday");
 
     // Format parts
-    const day = parsedDate.getDate(); // e.g., 21
-    const time = parsedDate.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }); // e.g., "3:00 PM"
+
+    if (title == "Remind me") {
+      time = "9:00 PM";
+      day = "";
+    } else if (title == "Add due date") {
+      time = "";
+      day = parsedDate.toLocaleDateString([], {
+        weekday: "short",
+        day: "numeric",
+      });
+    } else {
+      day = " ";
+      time = " ";
+    }
+
+    // Set default time to 9 PM
 
     dateContainer.innerHTML = `
       <span class="date-day">${day}</span>
@@ -473,4 +648,245 @@ function assignDateToOption() {
     `;
   });
 }
-assignDateToOption();
+
+// Add to my day
+function addToMyDay() {
+  const mainContainer = document.querySelector(".option-myday");
+  if (mainContainer) {
+    mainContainer.onclick = () => {
+      const title = mainContainer.getAttribute("title");
+
+      // Only apply changes if not already changed
+      if (!mainContainer.querySelector(".changed-option")) {
+        mainContainer.innerHTML = `<div class="changed-option" style="
+        padding:16px; display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    color: var(--primary);">
+              <span class="option-text" style ="  color: var(--primary);">Added to MY Day</span>
+              <svg class="lucide" viewBox="0 0 24 24" width="21px" height="21px" xmlns="http://www.w3.org/2000/svg">
+                <path d="m18 6-12 12"></path>
+                <path d="m6 6 12 12"></path>
+              </svg>
+         
+            </div>`;
+        mainContainer.classList.add("active");
+
+        // Add event listener to the X icon
+        const closeIcon = mainContainer.querySelector(".changed-option svg");
+        if (closeIcon) {
+          closeIcon.onclick = (e) => {
+            e.stopPropagation(); // Prevent triggering the parent click event
+            reviveOldValue(mainContainer, title);
+            mainContainer.classList.remove("active");
+          };
+        }
+      }
+    };
+  }
+}
+
+//Initialize sort options
+initSortOptions();
+
+//Setup sort options event listeners
+function initSortOptions() {
+  const sortOptionElements = document.querySelectorAll(".sort-option");
+
+  sortOptionElements.forEach((option) => {
+    option.addEventListener("click", () => {
+      const sortType = option.getAttribute("data-sort");
+      sortTasks(sortType);
+    });
+  });
+}
+
+//Sort tasks based on different criteria
+function sortTasks(sortType) {
+  switch (sortType) {
+    case "importance":
+      sortTasksByImportance();
+      break;
+    case "alphabetical":
+      sortTasksByAlphabetical();
+      break;
+    case "dueDate":
+      sortTasksByDueDate();
+      break;
+    case "date":
+      sortTasksByMyDay();
+      break;
+    case "creationDate":
+      sortTasksByCreationDate();
+      break;
+    default:
+      break;
+  }
+}
+
+//Sort tasks with favorites first
+function sortTasksByImportance() {
+  const incompleteTasks = Array.from(
+    document.querySelectorAll(".inco-tasks .task")
+  );
+  const incoTasksContainer = document.querySelector(".inco-tasks");
+
+  incompleteTasks.sort((a, b) => {
+    const aIsFav = a.querySelector(".fav-star").classList.contains("active");
+    const bIsFav = b.querySelector(".fav-star").classList.contains("active");
+
+    if (aIsFav && !bIsFav) return -1;
+    if (!aIsFav && bIsFav) return 1;
+    return 0;
+  });
+
+  incompleteTasks.forEach((task) => {
+    incoTasksContainer.appendChild(task);
+  });
+
+  const completedTasks = Array.from(
+    document.querySelectorAll(".completed-tasks .task")
+  );
+  console.log(completedTasks);
+  const completedTasksContainer = document.querySelector(".completed-tasks");
+
+  completedTasks.sort((a, b) => {
+    const aIsFav = a.querySelector(".fav-star").classList.contains("active");
+    const bIsFav = b.querySelector(".fav-star").classList.contains("active");
+
+    if (aIsFav && !bIsFav) return -1;
+    if (!aIsFav && bIsFav) return 1;
+    return 0;
+  });
+
+  completedTasks.forEach((task) => {
+    completedTasksContainer.appendChild(task);
+  });
+}
+
+//Sort tasks alphabetically by title
+function sortTasksByAlphabetical() {
+  sortTasksInContainer(".inco-tasks", (a, b) => {
+    const aTitle = a.querySelector(".task-title").textContent.toLowerCase();
+    const bTitle = b.querySelector(".task-title").textContent.toLowerCase();
+    return aTitle.localeCompare(bTitle);
+  });
+
+  sortTasksInContainer(".completed-tasks", (a, b) => {
+    const aTitle = a.querySelector(".task-title").textContent.toLowerCase();
+    const bTitle = b.querySelector(".task-title").textContent.toLowerCase();
+    return aTitle.localeCompare(bTitle);
+  });
+}
+
+//Sort tasks by due date
+function sortTasksByDueDate() {
+  sortTasksInContainer(".inco-tasks", (a, b) => {
+    const date1 = a.querySelector(".task-date");
+    const date2 = b.querySelector(".task-date");
+
+    const aDate = date1
+      ? new Date(date1.textContent.trim())
+      : new Date(1000000000000);
+    const bDate = date2
+      ? new Date(date2.textContent.trim())
+      : new Date(1000000000000);
+
+    const aValid = !isNaN(aDate.getTime());
+    const bValid = !isNaN(bDate.getTime());
+
+    if (!aValid && !bValid) return 0;
+    if (!aValid) return 1;
+    if (!bValid) return -1;
+
+    return aDate - bDate;
+  });
+
+  sortTasksInContainer(".completed-tasks", (a, b) => {
+    const date1 = a.querySelector(".task-date");
+    const date2 = b.querySelector(".task-date");
+
+    const aDate = date1
+      ? new Date(date1.textContent.trim())
+      : new Date(1000000000000);
+    const bDate = date2
+      ? new Date(date2.textContent.trim())
+      : new Date(1000000000000);
+
+    const aValid = !isNaN(aDate.getTime());
+    const bValid = !isNaN(bDate.getTime());
+
+    if (!aValid && !bValid) return 0;
+    if (!aValid) return 1;
+    if (!bValid) return -1;
+
+    return aDate - bDate;
+  });
+}
+
+//Sort tasks by "My Day" status
+function sortTasksByMyDay() {
+  const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  sortTasksInContainer(".inco-tasks", (a, b) => {
+    const aId = a.getAttribute("index");
+    const bId = b.getAttribute("index");
+
+    const aTask = tasks.find((task) => task.id == aId);
+    const bTask = tasks.find((task) => task.id == bId);
+
+    const aInMyDay = aTask && aTask.myDay;
+    const bInMyDay = bTask && bTask.myDay;
+
+    if (aInMyDay && !bInMyDay) return -1;
+    if (!aInMyDay && bInMyDay) return 1;
+    return 0;
+  });
+
+  sortTasksInContainer(".completed-tasks", (a, b) => {
+    const aId = a.getAttribute("index");
+    const bId = b.getAttribute("index");
+
+    const aTask = tasks.find((task) => task.id == aId);
+    const bTask = tasks.find((task) => task.id == bId);
+
+    const aInMyDay = aTask && aTask.myDay;
+    const bInMyDay = bTask && bTask.myDay;
+
+    if (aInMyDay && !bInMyDay) return -1;
+    if (!aInMyDay && bInMyDay) return 1;
+    return 0;
+  });
+}
+
+//Sort tasks by creation date
+function sortTasksByCreationDate() {
+  sortTasksInContainer(".inco-tasks", (a, b) => {
+    const aId = parseInt(a.getAttribute("index"));
+    const bId = parseInt(b.getAttribute("index"));
+    return aId - bId;
+  });
+
+  sortTasksInContainer(".completed-tasks", (a, b) => {
+    const aId = parseInt(a.getAttribute("index"));
+    const bId = parseInt(b.getAttribute("index"));
+    return aId - bId;
+  });
+}
+
+//Helper function to sort tasks in a container
+function sortTasksInContainer(containerSelector, compareFunction) {
+  const container = document.querySelector(containerSelector);
+  const tasks = Array.from(container.querySelectorAll(".task"));
+
+  if (tasks.length === 0) return;
+
+  tasks.sort(compareFunction);
+
+  tasks.forEach((task) => {
+    container.appendChild(task);
+  });
+}
+
+//for chose your date

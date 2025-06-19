@@ -390,19 +390,21 @@
         </div>
 
         <div class="task-options">
-          <div class="option-item">
-            <svg class="option-icon lucide" viewBox="0 0 24 24">
-              <path d="M8 2v4" />
-              <path d="M16 2v4" />
-              <rect width="18" height="18" x="3" y="4" rx="2" />
-              <path d="M3 10h18" />
-              <path d="M8 14h.01" />
-              <path d="M12 14h.01" />
-              <path d="M16 14h.01" />
-              <path d="M8 18h.01" />
-              <path d="M12 18h.01" />
-            </svg>
-            <span class="option-text">Add to My Day</span>
+          <div class="task-option option-myday">
+            <div class="option-item">
+              <svg class="option-icon lucide" viewBox="0 0 24 24">
+                <path d="M8 2v4" />
+                <path d="M16 2v4" />
+                <rect width="18" height="18" x="3" y="4" rx="2" />
+                <path d="M3 10h18" />
+                <path d="M8 14h.01" />
+                <path d="M12 14h.01" />
+                <path d="M16 14h.01" />
+                <path d="M8 18h.01" />
+                <path d="M12 18h.01" />
+              </svg>
+              <span class="option-text">Add to My Day</span>
+            </div>
           </div>
           <div class="task-option">
             <div class="option-item">
@@ -438,7 +440,7 @@
                     </svg>
                     <span class="date-title">Later Today </span>
                   </span>
-                  <span class="main-date">6:00AM</span>
+                  <span class="main-date"></span>
                 </span>
                 <span class="task-more-option date-option">
                   <span>
@@ -465,7 +467,7 @@
 
                     <span class="date-title"> Tomorrow </span>
                   </span>
-                  <span class="main-date">6:00AM</span>
+                  <span class="main-date"></span>
                 </span>
                 <span class="task-more-option date-option date-option">
                   <span>
@@ -489,33 +491,37 @@
                     </svg>
                     <span class="date-title"> Next Week </span>
                   </span>
-                  <span class="main-date">6:00AM</span>
+                  <span class="main-date"></span>
                 </span>
                 <span class="task-more-option">
-                  <span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-calendar-clock-icon lucide-calendar-clock"
-                    >
-                      <path
-                        d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"
-                      />
-                      <path d="M16 2v4" />
-                      <path d="M8 2v4" />
-                      <path d="M3 10h5" />
-                      <path d="M17.5 17.5 16 16.3V14" />
-                      <circle cx="16" cy="16" r="6" />
-                    </svg>
-                    <span class="date-title"> Chose Your Date</span>
-                  </span>
+                  <button type="button" class="costum-time" id="time-trigger">
+                    <input type="datetime-local" id="realTimeInput" />
+
+                    <span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-calendar-clock-icon lucide-calendar-clock"
+                      >
+                        <path
+                          d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"
+                        />
+                        <path d="M16 2v4" />
+                        <path d="M8 2v4" />
+                        <path d="M3 10h5" />
+                        <path d="M17.5 17.5 16 16.3V14" />
+                        <circle cx="16" cy="16" r="6" />
+                      </svg>
+                      <span class="date-title"> Chose your time</span>
+                    </span>
+                  </button>
                 </span>
               </div>
             </div>
@@ -527,7 +533,7 @@
                 <path d="m7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
 
-              <span class="option-text">Add due date </span>
+              <span class="option-text">Add due date</span>
               <div class="task-options-more inactive date-options">
                 <span class="task-more-option date-option">
                   <span>
@@ -554,7 +560,7 @@
                     </svg>
                     <span class="date-title"> Today </span>
                   </span>
-                  <span class="main-date">6:00AM</span>
+                  <span class="main-date"></span>
                 </span>
                 <span class="task-more-option date-option">
                   <span>
@@ -581,7 +587,7 @@
 
                     <span class="date-title"> Next day </span>
                   </span>
-                  <span class="main-date">6:00AM</span>
+                  <span class="main-date"></span>
                 </span>
                 <span class="task-more-option date-option">
                   <span>
@@ -605,7 +611,7 @@
                     </svg>
                     <span class="date-title"> Next Week </span>
                   </span>
-                  <span class="main-date">6:00AM</span>
+                  <span class="main-date"></span>
                 </span>
                 <span class="task-more-option">
                   <span>
@@ -645,7 +651,7 @@
               </svg>
               <span class="option-text">Repeat</span>
               <div class="task-options-more inactive">
-                <span class="task-more-option">
+                <span class="task-more-option date-option">
                   <span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -668,10 +674,11 @@
                       <path d="M3 10h18" />
                       <path d="M8 2v4" />
                     </svg>
-                    <span class="date-title"> Today </span>
+                    <span class="date-title"> Daily </span>
                   </span>
+                  <span class="main-date"></span>
                 </span>
-                <span class="task-more-option">
+                <span class="task-more-option date-option">
                   <span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -683,21 +690,22 @@
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      class="lucide lucide-calendar-check2-icon lucide-calendar-check-2"
+                      class="lucide lucide-calendar-arrow-down-icon lucide-calendar-arrow-down"
                     >
-                      <path d="M8 2v4" />
+                      <path d="m14 18 4 4 4-4" />
                       <path d="M16 2v4" />
+                      <path d="M18 14v8" />
                       <path
-                        d="M21 14V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"
+                        d="M21 11.354V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7.343"
                       />
                       <path d="M3 10h18" />
-                      <path d="m16 20 2 2 4-4" />
+                      <path d="M8 2v4" />
                     </svg>
-
-                    <span class="date-title"> Tommorrow </span>
+                    <span class="date-title"> Weekly </span>
                   </span>
+                  <span class="main-date"></span>
                 </span>
-                <span class="task-more-option">
+                <span class="task-more-option date-option">
                   <span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -709,18 +717,77 @@
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      class="lucide lucide-calendar1-icon lucide-calendar-1"
+                      class="lucide lucide-calendar-arrow-down-icon lucide-calendar-arrow-down"
                     >
-                      <path d="M11 14h1v4" />
+                      <path d="m14 18 4 4 4-4" />
                       <path d="M16 2v4" />
+                      <path d="M18 14v8" />
+                      <path
+                        d="M21 11.354V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7.343"
+                      />
                       <path d="M3 10h18" />
                       <path d="M8 2v4" />
-                      <rect x="3" y="4" width="18" height="18" rx="2" />
                     </svg>
-                    <span class="date-title"> Next Week </span>
+                    <span class="date-title"> Weekdays </span>
                   </span>
+                  <span class="main-date"></span>
                 </span>
-                <span class="task-more-option">
+                <span class="task-more-option date-option">
+                  <span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-calendar-arrow-down-icon lucide-calendar-arrow-down"
+                    >
+                      <path d="m14 18 4 4 4-4" />
+                      <path d="M16 2v4" />
+                      <path d="M18 14v8" />
+                      <path
+                        d="M21 11.354V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7.343"
+                      />
+                      <path d="M3 10h18" />
+                      <path d="M8 2v4" />
+                    </svg>
+                    <span class="date-title"> Monthly </span>
+                  </span>
+                  <span class="main-date"></span>
+                </span>
+                <span class="task-more-option date-option">
+                  <span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-calendar-arrow-down-icon lucide-calendar-arrow-down"
+                    >
+                      <path d="m14 18 4 4 4-4" />
+                      <path d="M16 2v4" />
+                      <path d="M18 14v8" />
+                      <path
+                        d="M21 11.354V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7.343"
+                      />
+                      <path d="M3 10h18" />
+                      <path d="M8 2v4" />
+                    </svg>
+                    <span class="date-title"> Yearly </span>
+                  </span>
+                  <span class="main-date"></span>
+                </span>
+
+                <span class="task-more-option date-option">
                   <span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -743,8 +810,9 @@
                       <path d="M17.5 17.5 16 16.3V14" />
                       <circle cx="16" cy="16" r="6" />
                     </svg>
-                    <span class="date-title"> Chose Your Date</span>
+                    <span class="date-title">Costum</span>
                   </span>
+                  <span class="main-date"></span>
                 </span>
               </div>
             </div>
@@ -752,7 +820,10 @@
         </div>
 
         <div class="task-options">
-          <div class="option-item">
+          <div class="hidden" id="file-preview"></div>
+          <label class="option-item">
+            <input type="file" id="fileInput" />
+
             <svg class="option-icon lucide" viewBox="0 0 24 24">
               <path
                 d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
@@ -760,7 +831,7 @@
               <polyline points="14,2 14,8 20,8" />
             </svg>
             <span class="option-text">Add file</span>
-          </div>
+          </label>
         </div>
 
         <div class="notes-section">

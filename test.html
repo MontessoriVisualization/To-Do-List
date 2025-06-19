@@ -3,23 +3,748 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <!-- <script src="https://unpkg.com/chrono-node"></script> -->
+    <title>Alarm Clock</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #1e3c72 0%,
+          #2a5298 50%,
+          #667eea 100%
+        );
+        min-height: 100vh;
+        color: white;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      .clock-header {
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .clock-icon {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 20px;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>')
+          no-repeat center;
+        background-size: contain;
+      }
+
+      .app-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .current-time {
+        font-size: 42px;
+        font-family: "Courier New", monospace;
+        color: #93c5fd;
+        margin-bottom: 10px;
+      }
+
+      .current-date {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 16px;
+      }
+
+      .add-alarm-btn {
+        width: 100%;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 12px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-bottom: 30px;
+        transition: background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .add-alarm-btn:hover {
+        background: #2563eb;
+      }
+
+      .add-icon {
+        width: 20px;
+        height: 20px;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>')
+          no-repeat center;
+        background-size: contain;
+      }
+
+      .alarms-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .alarm-item {
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .alarm-info {
+        flex: 1;
+      }
+
+      .alarm-time {
+        font-size: 24px;
+        font-family: "Courier New", monospace;
+        margin-bottom: 5px;
+      }
+
+      .alarm-details {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .alarm-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .control-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 6px;
+        transition: color 0.3s;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .control-btn:hover {
+        color: white;
+      }
+
+      .delete-btn:hover {
+        color: #ef4444;
+      }
+
+      .toggle-switch {
+        width: 48px;
+        height: 24px;
+        background: #6b7280;
+        border-radius: 12px;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .toggle-switch.active {
+        background: #10b981;
+      }
+
+      .toggle-slider {
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.3s;
+      }
+
+      .toggle-switch.active .toggle-slider {
+        transform: translateX(24px);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .empty-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        opacity: 0.5;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>')
+          no-repeat center;
+        background-size: contain;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        color: #1f2937;
+        border-radius: 16px;
+        padding: 30px;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .modal-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      .form-input,
+      .form-select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 16px;
+      }
+
+      .form-input[type="time"] {
+        font-family: "Courier New", monospace;
+        font-size: 18px;
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+      }
+
+      .modal-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .cancel-btn {
+        background: #f3f4f6;
+        color: #374151;
+      }
+
+      .cancel-btn:hover {
+        background: #e5e7eb;
+      }
+
+      .save-btn {
+        background: #3b82f6;
+        color: white;
+      }
+
+      .save-btn:hover {
+        background: #2563eb;
+      }
+
+      /* Active Alarm Modal */
+      .alarm-modal {
+        background: #dc2626;
+        text-align: center;
+        animation: pulse 1s infinite;
+      }
+
+      .alarm-modal .modal-content {
+        background: #dc2626;
+        color: white;
+      }
+
+      .alarm-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>')
+          no-repeat center;
+        background-size: contain;
+      }
+
+      .alarm-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .alarm-time-display {
+        font-size: 20px;
+        font-family: "Courier New", monospace;
+        margin-bottom: 10px;
+      }
+
+      .dismiss-btn {
+        background: white;
+        color: #dc2626;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+
+      .dismiss-btn:hover {
+        background: #f3f4f6;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .edit-icon {
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>')
+          no-repeat center;
+        background-size: 16px;
+      }
+
+      .delete-icon {
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>')
+          no-repeat center;
+        background-size: 16px;
+      }
+    </style>
   </head>
   <body>
-    <input type="text" id="input" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <input type="checkbox" name="" class="input" id="" />
-    <script type="module" src="test-chrono.js"></script>
+    <div class="container">
+      <!-- Header with Clock -->
+      <div class="clock-header">
+        <div class="clock-icon"></div>
+        <h1 class="app-title">Alarm Clock</h1>
+        <div class="current-time" id="currentTime">00:00:00</div>
+        <div class="current-date" id="currentDate"></div>
+      </div>
+
+      <!-- Add Alarm Button -->
+      <button class="add-alarm-btn" onclick="showAddModal()">
+        <div class="add-icon"></div>
+        Add New Alarm
+      </button>
+
+      <!-- Alarms List -->
+      <div class="alarms-list" id="alarmsList">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon"></div>
+          <p>No alarms set</p>
+          <p style="font-size: 14px; margin-top: 5px">
+            Tap "Add New Alarm" to get started
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Alarm Modal -->
+    <div class="modal" id="alarmModal">
+      <div class="modal-content">
+        <h2 class="modal-title" id="modalTitle">Add New Alarm</h2>
+
+        <div class="form-group">
+          <label class="form-label">Time</label>
+          <input type="time" class="form-input" id="timeInput" value="07:00" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Label (optional)</label>
+          <input
+            type="text"
+            class="form-input"
+            id="labelInput"
+            placeholder="e.g., Wake up, Meeting, etc."
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Repeat</label>
+          <select
+            class="form-select"
+            id="repeatSelect"
+            onchange="toggleWeekDaySelect()"
+          >
+            <option value="daily">Daily</option>
+            <option value="weekdays">Weekdays (Mon-Fri)</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="weekDayGroup" style="display: none">
+          <label class="form-label">Day of Week</label>
+          <select class="form-select" id="weekDaySelect">
+            <option value="0">Sunday</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+          </select>
+        </div>
+
+        <div class="modal-buttons">
+          <button class="modal-btn cancel-btn" onclick="hideModal()">
+            Cancel
+          </button>
+          <button class="modal-btn save-btn" onclick="saveAlarm()">
+            Add Alarm
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Alarm Modal -->
+    <div class="modal alarm-modal" id="activeAlarmModal">
+      <div class="modal-content">
+        <div class="alarm-icon"></div>
+        <h2 class="alarm-title">ALARM!</h2>
+        <div class="alarm-time-display" id="alarmTimeDisplay"></div>
+        <div id="alarmLabelDisplay"></div>
+        <button class="dismiss-btn" onclick="dismissAlarm()">Dismiss</button>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      let alarms = [];
+      let editingAlarmId = null;
+      let activeAlarmTimeout = null;
+
+      // Initialize app
+      document.addEventListener("DOMContentLoaded", function () {
+        updateClock();
+        setInterval(updateClock, 1000);
+        setInterval(checkAlarms, 1000);
+        loadAlarms();
+        renderAlarms();
+      });
+
+      // Update current time display
+      function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+        const dateString = now.toLocaleDateString([], {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+
+        document.getElementById("currentTime").textContent = timeString;
+        document.getElementById("currentDate").textContent = dateString;
+      }
+
+      // Show add alarm modal
+      function showAddModal() {
+        editingAlarmId = null;
+        document.getElementById("modalTitle").textContent = "Add New Alarm";
+        document.getElementById("timeInput").value = "07:00";
+        document.getElementById("labelInput").value = "";
+        document.getElementById("repeatSelect").value = "daily";
+        document.getElementById("weekDaySelect").value = "1";
+        document.querySelector(".save-btn").textContent = "Add Alarm";
+        toggleWeekDaySelect();
+        document.getElementById("alarmModal").classList.add("active");
+      }
+
+      // Show edit alarm modal
+      function showEditModal(alarmId) {
+        const alarm = alarms.find((a) => a.id === alarmId);
+        if (!alarm) return;
+
+        editingAlarmId = alarmId;
+        document.getElementById("modalTitle").textContent = "Edit Alarm";
+        document.getElementById("timeInput").value = alarm.time;
+        document.getElementById("labelInput").value = alarm.label || "";
+        document.getElementById("repeatSelect").value = alarm.repeat;
+        document.getElementById("weekDaySelect").value = alarm.weekDay || 1;
+        document.querySelector(".save-btn").textContent = "Update Alarm";
+        toggleWeekDaySelect();
+        document.getElementById("alarmModal").classList.add("active");
+      }
+
+      // Hide modal
+      function hideModal() {
+        document.getElementById("alarmModal").classList.remove("active");
+        editingAlarmId = null;
+      }
+
+      // Toggle week day select visibility
+      function toggleWeekDaySelect() {
+        const repeat = document.getElementById("repeatSelect").value;
+        const weekDayGroup = document.getElementById("weekDayGroup");
+        weekDayGroup.style.display = repeat === "weekly" ? "block" : "none";
+      }
+
+      // Save alarm
+      function saveAlarm() {
+        const time = document.getElementById("timeInput").value;
+        const label = document.getElementById("labelInput").value;
+        const repeat = document.getElementById("repeatSelect").value;
+        const weekDay = parseInt(
+          document.getElementById("weekDaySelect").value
+        );
+
+        if (!time) {
+          alert("Please select a time");
+          return;
+        }
+
+        const alarmData = {
+          time,
+          label,
+          repeat,
+          weekDay,
+          enabled: true,
+        };
+
+        if (editingAlarmId) {
+          // Update existing alarm
+          const index = alarms.findIndex((a) => a.id === editingAlarmId);
+          if (index !== -1) {
+            alarms[index] = { ...alarms[index], ...alarmData };
+          }
+        } else {
+          // Add new alarm
+          const newAlarm = {
+            id: Date.now(),
+            ...alarmData,
+          };
+          alarms.push(newAlarm);
+        }
+
+        saveAlarms();
+        renderAlarms();
+        hideModal();
+      }
+
+      // Delete alarm
+      function deleteAlarm(alarmId) {
+        if (confirm("Are you sure you want to delete this alarm?")) {
+          alarms = alarms.filter((a) => a.id !== alarmId);
+          saveAlarms();
+          renderAlarms();
+        }
+      }
+
+      // Toggle alarm enabled/disabled
+      function toggleAlarm(alarmId) {
+        const alarm = alarms.find((a) => a.id === alarmId);
+        if (alarm) {
+          alarm.enabled = !alarm.enabled;
+          saveAlarms();
+          renderAlarms();
+        }
+      }
+
+      // Get repeat text
+      function getRepeatText(alarm) {
+        if (alarm.repeat === "daily") return "Daily";
+        if (alarm.repeat === "weekdays") return "Weekdays (Mon-Fri)";
+        if (alarm.repeat === "weekly") {
+          const days = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ];
+          return `Weekly on ${days[alarm.weekDay]}`;
+        }
+        return "Once";
+      }
+
+      // Render alarms list
+      function renderAlarms() {
+        const alarmsList = document.getElementById("alarmsList");
+        const emptyState = document.getElementById("emptyState");
+
+        if (alarms.length === 0) {
+          emptyState.style.display = "block";
+          return;
+        }
+
+        emptyState.style.display = "none";
+
+        alarmsList.innerHTML = alarms
+          .map(
+            (alarm) => `
+                <div class="alarm-item">
+                    <div class="alarm-info">
+                        <div class="alarm-time">${alarm.time}</div>
+                        <div class="alarm-details">
+                            ${
+                              alarm.label ? alarm.label + " • " : ""
+                            }${getRepeatText(alarm)}
+                        </div>
+                    </div>
+                    <div class="alarm-controls">
+                        <button class="control-btn" onclick="showEditModal(${
+                          alarm.id
+                        })">
+                            <div class="edit-icon"></div>
+                        </button>
+                        <button class="control-btn delete-btn" onclick="deleteAlarm(${
+                          alarm.id
+                        })">
+                            <div class="delete-icon"></div>
+                        </button>
+                        <div class="toggle-switch ${
+                          alarm.enabled ? "active" : ""
+                        }" onclick="toggleAlarm(${alarm.id})">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      // Check for triggered alarms
+      function checkAlarms() {
+        const now = new Date();
+        const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        const currentTimeStr = now.toTimeString().slice(0, 5); // HH:MM format
+
+        alarms.forEach((alarm) => {
+          if (!alarm.enabled) return;
+
+          const shouldTrigger = () => {
+            if (alarm.repeat === "daily") return true;
+            if (alarm.repeat === "weekly") {
+              return currentDay === alarm.weekDay;
+            }
+            if (alarm.repeat === "weekdays") {
+              return currentDay >= 1 && currentDay <= 5; // Monday to Friday
+            }
+            return false;
+          };
+
+          if (alarm.time === currentTimeStr && shouldTrigger()) {
+            triggerAlarm(alarm);
+          }
+        });
+      }
+
+      // Trigger alarm
+      function triggerAlarm(alarm) {
+        document.getElementById("alarmTimeDisplay").textContent = alarm.time;
+        document.getElementById("alarmLabelDisplay").textContent =
+          alarm.label || "";
+        document.getElementById("activeAlarmModal").classList.add("active");
+
+        // Auto-dismiss after 30 seconds
+        if (activeAlarmTimeout) {
+          clearTimeout(activeAlarmTimeout);
+        }
+        activeAlarmTimeout = setTimeout(() => {
+          dismissAlarm();
+        }, 30000);
+      }
+
+      // Dismiss alarm
+      function dismissAlarm() {
+        document.getElementById("activeAlarmModal").classList.remove("active");
+        if (activeAlarmTimeout) {
+          clearTimeout(activeAlarmTimeout);
+          activeAlarmTimeout = null;
+        }
+      }
+
+      // Save alarms to localStorage
+      function saveAlarms() {
+        const alarmsData = JSON.stringify(alarms);
+        // Note: localStorage is not available in Claude artifacts
+        // In a real environment, you would use: localStorage.setItem('alarms', alarmsData);
+      }
+
+      // Load alarms from localStorage
+      function loadAlarms() {
+        // Note: localStorage is not available in Claude artifacts
+        // In a real environment, you would use:
+        // const savedAlarms = localStorage.getItem('alarms');
+        // if (savedAlarms) {
+        //     alarms = JSON.parse(savedAlarms);
+        // }
+
+        // For demonstration, we'll add a sample alarm
+        alarms = [
+          {
+            id: 1,
+            time: "07:00",
+            label: "Wake up",
+            repeat: "weekdays",
+            weekDay: 1,
+            enabled: true,
+          },
+        ];
+      }
+    </script>
   </body>
 </html>
